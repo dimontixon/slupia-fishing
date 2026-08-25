@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+// Fishing sector (peg) on the lake map. Polygon points are stored as
+// percentages (0-100) of the satellite photo's width/height so the map
+// scales on any screen without recalculation.
+model Sector {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  polygon   Json
+  isActive  Boolean  @default(true)
+  basePrice Decimal  @db.Decimal(10, 2)
+  notes     String?
+  bookings  Booking[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Singleton row holding the owner-configurable booking rules. Never
+// hardcode slot times / min-max slots / cancellation window in code.
+model BookingSettings {
+  id                        String   @id @default(cuid())
+  slotStartTimes            String[]
+  slotStepHours             Int      @default(12)
+  minSlots                  Int      @default(1)
+  maxSlots                  Int      @default(4)
+  cancellationHoursBefore   Int      @default(24)
+  requireManualConfirmation Boolean  @default(true)
+  updatedAt                 DateTime @updatedAt
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  phone     String    @unique
+  name      String?
+  isBlocked Boolean   @default(false)
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  sector      Sector        @relation(fields: [sectorId], references: [id])
+  sectorId    String
+  client      Client        @relation(fields: [clientId], references: [id])
+  clientId    String
+  startAt     DateTime
+  endAt       DateTime
+  slotsCount  Int
+  status      BookingStatus @default(PENDING)
+  totalPrice  Decimal       @db.Decimal(10, 2)
+  createdAt   DateTime      @default(now())
+
+  @@index([sectorId, startAt, endAt])
+}
+
+// One-time SMS login codes for client phone auth. Codes are logged to the
+// server console in development instead of being sent via a real SMS
+// provider (see lib/otp.ts).
+model OtpCode {
+  id        String   @id @default(cuid())
+  phone     String
+  code      String
+  expiresAt DateTime
+  consumed  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([phone])
+}
