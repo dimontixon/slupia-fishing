@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Sektory" },
   { href: "/admin/rezerwacje", label: "Rezerwacje" },
   { href: "/admin/klienci", label: "Klienci" },
+  { href: "/admin/ustawienia", label: "Ustawienia" },
 ];
 
 export default function AdminProtectedLayout({ children }: { children: ReactNode }) {

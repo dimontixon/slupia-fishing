@@ -28,6 +28,11 @@ Aplikacja: http://localhost:3000, panel administratora: http://localhost:3000/ad
 node -e "console.log(require('bcryptjs').hashSync('twoje-haslo', 10))"
 ```
 
+Wynik wygląda np. tak: `$2b$10$zdhCcxTq5YpOGPVdTY5CP.9PYOmXfE...`. **Zanim
+wkleisz go do `.env`, zamień ręcznie każdy `$` na `\$`** (np.
+`\$2b\$10\$zdhCcx...`) — Next.js interpoluje `$nazwa` w plikach `.env`, więc
+surowy hash bcrypt (pełen `$`) zostałby ucięty bez tego escapowania.
+
 ### Logowanie SMS OTP (klienci)
 
 W trybie deweloperskim kod logowania **nie jest wysyłany SMS-em** — pojawia się
