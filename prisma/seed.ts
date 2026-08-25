@@ -55,7 +55,7 @@ function squarePolygon({ x, y }: Point): Point[] {
   ];
 }
 
-const DEFAULT_BASE_PRICE = 50;
+const DEFAULT_BASE_PRICE = 40;
 
 async function main() {
   await prisma.bookingSettings.upsert({

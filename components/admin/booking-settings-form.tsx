@@ -14,7 +14,7 @@ import type { BookingSettingsShape } from "@/lib/booking";
 
 export function BookingSettingsForm({ settings }: { settings: BookingSettingsShape }) {
   const router = useRouter();
-  const [slotStartTimesText, setSlotStartTimesText] = useState(settings.slotStartTimes.join(", "));
+  const [times, setTimes] = useState<string[]>(settings.slotStartTimes);
   const [slotStepHours, setSlotStepHours] = useState(String(settings.slotStepHours));
   const [minSlots, setMinSlots] = useState(String(settings.minSlots));
   const [maxSlots, setMaxSlots] = useState(String(settings.maxSlots));
@@ -23,12 +23,24 @@ export function BookingSettingsForm({ settings }: { settings: BookingSettingsSha
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
+  function updateTime(index: number, value: string) {
+    setTimes((prev) => prev.map((t, i) => (i === index ? value : t)));
+  }
+
+  function removeTime(index: number) {
+    setTimes((prev) => prev.filter((_, i) => i !== index));
+  }
+
+  function addTime() {
+    setTimes((prev) => [...prev, "12:00"]);
+  }
+
   function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
     startTransition(async () => {
       const result = await updateBookingSettings({
-        slotStartTimesText,
+        slotStartTimes: times,
         slotStepHours: Number(slotStepHours),
         minSlots: Number(minSlots),
         maxSlots: Number(maxSlots),
@@ -48,14 +60,35 @@ export function BookingSettingsForm({ settings }: { settings: BookingSettingsSha
     <form onSubmit={handleSubmit} className="max-w-md space-y-4">
       {error && <p className="text-sm text-destructive">{error}</p>}
       <div className="space-y-2">
-        <Label htmlFor="slot-start-times">Godziny startu (oddzielone przecinkami)</Label>
-        <Input
-          id="slot-start-times"
-          value={slotStartTimesText}
-          onChange={(event) => setSlotStartTimesText(event.target.value)}
-          placeholder="12:00, 18:00"
-          required
-        />
+        <Label>Godziny startu</Label>
+        <div className="flex flex-wrap items-center gap-2">
+          {times.map((time, index) => (
+            <div key={index} className="flex items-center gap-1 rounded-md border pl-2 pr-1 py-1">
+              <input
+                type="time"
+                value={time}
+                onChange={(event) => updateTime(index, event.target.value)}
+                className="w-24 bg-transparent text-sm outline-none"
+              />
+              <button
+                type="button"
+                onClick={() => removeTime(index)}
+                aria-label="Usuń godzinę"
+                className="rounded px-1 text-muted-foreground hover:bg-muted hover:text-destructive"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <Button type="button" variant="outline" size="sm" onClick={addTime}>
+            + Dodaj godzinę
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          {times.length === 0
+            ? "Brak stałych godzin — klienci będą mogli wybrać dowolną godzinę startu."
+            : "Rezerwacje będą mogły zaczynać się tylko o wskazanych godzinach."}
+        </p>
       </div>
       <div className="space-y-2">
         <Label htmlFor="slot-step-hours">Długość slotu (godziny)</Label>

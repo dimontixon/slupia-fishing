@@ -75,8 +75,20 @@ export async function updateSector(
   return { ok: true };
 }
 
+export async function updateAllSectorPrices(basePrice: number): Promise<ActionResult> {
+  await requireAdminSession();
+
+  if (!Number.isFinite(basePrice) || basePrice <= 0) {
+    return { ok: false, error: "Cena musi być liczbą dodatnią." };
+  }
+
+  await prisma.sector.updateMany({ data: { basePrice } });
+
+  return { ok: true };
+}
+
 export async function updateBookingSettings(data: {
-  slotStartTimesText: string;
+  slotStartTimes: string[];
   slotStepHours: number;
   minSlots: number;
   maxSlots: number;
@@ -85,13 +97,12 @@ export async function updateBookingSettings(data: {
 }): Promise<ActionResult> {
   await requireAdminSession();
 
-  const slotStartTimes = data.slotStartTimesText
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
+  // An empty list is a deliberate, valid state: it means clients may pick
+  // any start time instead of being restricted to fixed slots.
+  const slotStartTimes = [...new Set(data.slotStartTimes)];
 
-  if (slotStartTimes.length === 0 || !slotStartTimes.every((t) => TIME_REGEX.test(t))) {
-    return { ok: false, error: "Godziny startu muszą być w formacie HH:mm, oddzielone przecinkami." };
+  if (!slotStartTimes.every((t) => TIME_REGEX.test(t))) {
+    return { ok: false, error: "Każda godzina startu musi być w formacie HH:mm." };
   }
   if (!Number.isInteger(data.slotStepHours) || data.slotStepHours <= 0) {
     return { ok: false, error: "Krok slotu musi być dodatnią liczbą całkowitą godzin." };
@@ -146,6 +157,19 @@ export async function updateBookingStatus(bookingId: string, nextStatus: Booking
   }
 
   await prisma.booking.update({ where: { id: bookingId }, data: { status: nextStatus } });
+
+  return { ok: true };
+}
+
+export async function updateClientName(clientId: string, name: string): Promise<ActionResult> {
+  await requireAdminSession();
+
+  const client = await prisma.client.findUnique({ where: { id: clientId } });
+  if (!client) {
+    return { ok: false, error: "Klient nie istnieje." };
+  }
+
+  await prisma.client.update({ where: { id: clientId }, data: { name: name.trim() || null } });
 
   return { ok: true };
 }

@@ -4,7 +4,8 @@ import { SectorsTable, type AdminSector } from "@/components/admin/sectors-table
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboardPage() {
-  const sectors = await prisma.sector.findMany({ orderBy: { code: "asc" } });
+  const sectors = await prisma.sector.findMany();
+  sectors.sort((a, b) => Number(a.code) - Number(b.code));
 
   const adminSectors: AdminSector[] = sectors.map((sector) => ({
     id: sector.id,

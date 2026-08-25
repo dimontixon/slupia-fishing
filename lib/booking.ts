@@ -39,6 +39,8 @@ function formatTime(date: Date): string {
   return `${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
 }
 
+const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+
 function computeMaxConsecutiveSlots(
   startAt: Date,
   settings: Pick<BookingSettingsShape, "maxSlots" | "slotStepHours">,
@@ -68,11 +70,19 @@ export type AvailabilityResult =
       minSlots: number;
       maxSlots: number;
       slotStepHours: number;
+      // true when the owner hasn't fixed any start times (BookingSettings.slotStartTimes
+      // is empty) — clients may then request an arbitrary start time instead of
+      // picking from a preset list.
+      arbitraryTime: boolean;
       slots: AvailabilitySlot[];
     }
   | { ok: false; error: string };
 
-export async function getSectorAvailability(sectorId: string, dateISO: string): Promise<AvailabilityResult> {
+export async function getSectorAvailability(
+  sectorId: string,
+  dateISO: string,
+  customTime?: string,
+): Promise<AvailabilityResult> {
   const date = new Date(`${dateISO}T00:00:00`);
   if (Number.isNaN(date.getTime())) {
     return { ok: false, error: "Nieprawidłowa data." };
@@ -97,20 +107,37 @@ export async function getSectorAvailability(sectorId: string, dateISO: string): 
     select: { startAt: true, endAt: true },
   });
 
-  const slots: AvailabilitySlot[] = settings.slotStartTimes.map((time) => {
-    const startAt = combineDateAndTime(date, time);
-    return {
-      startAt: startAt.toISOString(),
-      time,
-      maxSlots: computeMaxConsecutiveSlots(startAt, settings, bookings),
-    };
-  });
+  const arbitraryTime = settings.slotStartTimes.length === 0;
+
+  let slots: AvailabilitySlot[];
+  if (arbitraryTime) {
+    slots =
+      customTime && TIME_REGEX.test(customTime)
+        ? [
+            {
+              startAt: combineDateAndTime(date, customTime).toISOString(),
+              time: customTime,
+              maxSlots: computeMaxConsecutiveSlots(combineDateAndTime(date, customTime), settings, bookings),
+            },
+          ]
+        : [];
+  } else {
+    slots = settings.slotStartTimes.map((time) => {
+      const startAt = combineDateAndTime(date, time);
+      return {
+        startAt: startAt.toISOString(),
+        time,
+        maxSlots: computeMaxConsecutiveSlots(startAt, settings, bookings),
+      };
+    });
+  }
 
   return {
     ok: true,
     minSlots: settings.minSlots,
     maxSlots: settings.maxSlots,
     slotStepHours: settings.slotStepHours,
+    arbitraryTime,
     slots,
   };
 }
@@ -155,7 +182,7 @@ export async function createBooking(input: {
   if (input.slotsCount < settings.minSlots || input.slotsCount > settings.maxSlots) {
     return { ok: false, error: `Liczba slotów musi być między ${settings.minSlots} a ${settings.maxSlots}.` };
   }
-  if (!settings.slotStartTimes.includes(formatTime(startAt))) {
+  if (settings.slotStartTimes.length > 0 && !settings.slotStartTimes.includes(formatTime(startAt))) {
     return { ok: false, error: "Nieprawidłowa godzina startu." };
   }
 
