@@ -1,13 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+
+import { BookingDialog } from "@/components/booking-dialog";
 
 type Point = { x: number; y: number };
 
@@ -19,7 +14,7 @@ export type MapSector = {
   basePrice: string;
 };
 
-export function SectorMap({ sectors }: { sectors: MapSector[] }) {
+export function SectorMap({ sectors, isLoggedIn }: { sectors: MapSector[]; isLoggedIn: boolean }) {
   const [selected, setSelected] = useState<MapSector | null>(null);
 
   return (
@@ -48,17 +43,7 @@ export function SectorMap({ sectors }: { sectors: MapSector[] }) {
         </svg>
       </div>
 
-      <Dialog open={selected !== null} onOpenChange={(open) => !open && setSelected(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{selected?.name}</DialogTitle>
-            <DialogDescription>
-              Cena: {selected ? Number(selected.basePrice).toFixed(2) : ""} zł / 12h
-            </DialogDescription>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">Rezerwacja — wkrótce.</p>
-        </DialogContent>
-      </Dialog>
+      <BookingDialog sector={selected} isLoggedIn={isLoggedIn} onClose={() => setSelected(null)} />
     </>
   );
 }
