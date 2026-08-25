@@ -67,7 +67,13 @@ export function BookingDialog({
   const [step, setStep] = useState<Step>("pick-slot");
   const [date, setDate] = useState(todayISO());
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
-  const [limits, setLimits] = useState<{ minSlots: number; maxSlots: number; slotStepHours: number } | null>(null);
+  const [limits, setLimits] = useState<{
+    minSlots: number;
+    maxSlots: number;
+    slotStepHours: number;
+    arbitraryTime: boolean;
+  } | null>(null);
+  const [customTime, setCustomTime] = useState("12:00");
   const [chosenSlot, setChosenSlot] = useState<AvailabilitySlot | null>(null);
   const [slotsCount, setSlotsCount] = useState(1);
   const [phone, setPhone] = useState("+48");
@@ -93,6 +99,7 @@ export function BookingDialog({
     setDate(todayISO());
     setSlots([]);
     setLimits(null);
+    setCustomTime("12:00");
     setChosenSlot(null);
     setSlotsCount(1);
     setError(null);
@@ -105,10 +112,10 @@ export function BookingDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sector?.id]);
 
-  function loadAvailability(sectorId: string, dateISO: string) {
+  function loadAvailability(sectorId: string, dateISO: string, customStartTime?: string) {
     startTransition(async () => {
       setError(null);
-      const result = await getSectorAvailability(sectorId, dateISO);
+      const result = await getSectorAvailability(sectorId, dateISO, customStartTime);
       if (!result.ok) {
         setError(result.error);
         setSlots([]);
@@ -116,7 +123,12 @@ export function BookingDialog({
         return;
       }
       setSlots(result.slots);
-      setLimits({ minSlots: result.minSlots, maxSlots: result.maxSlots, slotStepHours: result.slotStepHours });
+      setLimits({
+        minSlots: result.minSlots,
+        maxSlots: result.maxSlots,
+        slotStepHours: result.slotStepHours,
+        arbitraryTime: result.arbitraryTime,
+      });
     });
   }
 
@@ -129,6 +141,30 @@ export function BookingDialog({
     setChosenSlot(slot);
     setSlotsCount(limits?.minSlots ?? 1);
     setStep("duration");
+  }
+
+  function handleCheckCustomTime() {
+    if (!sector || !customTime) return;
+    setError(null);
+    startTransition(async () => {
+      const result = await getSectorAvailability(sector.id, date, customTime);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      setLimits({
+        minSlots: result.minSlots,
+        maxSlots: result.maxSlots,
+        slotStepHours: result.slotStepHours,
+        arbitraryTime: result.arbitraryTime,
+      });
+      const slot = result.slots[0];
+      if (!slot || slot.maxSlots === 0) {
+        setError("Ten termin jest niedostępny. Wybierz inną godzinę.");
+        return;
+      }
+      handleSelectSlot(slot);
+    });
   }
 
   function handleContinueFromDuration() {
@@ -216,20 +252,34 @@ export function BookingDialog({
             </div>
             <div className="space-y-2">
               <Label>Godzina startu</Label>
-              <div className="flex gap-2">
-                {slots.map((slot) => (
-                  <Button
-                    key={slot.time}
-                    type="button"
-                    variant={slot.maxSlots > 0 ? "outline" : "ghost"}
-                    disabled={slot.maxSlots === 0 || pending}
-                    onClick={() => handleSelectSlot(slot)}
-                  >
-                    {slot.time}
-                    {slot.maxSlots === 0 ? " (zajęte)" : ""}
+              {limits?.arbitraryTime ? (
+                <div className="flex gap-2">
+                  <Input
+                    type="time"
+                    value={customTime}
+                    onChange={(event) => setCustomTime(event.target.value)}
+                    className="w-32"
+                  />
+                  <Button type="button" onClick={handleCheckCustomTime} disabled={pending || !customTime}>
+                    Sprawdź dostępność
                   </Button>
-                ))}
-              </div>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  {slots.map((slot) => (
+                    <Button
+                      key={slot.time}
+                      type="button"
+                      variant={slot.maxSlots > 0 ? "outline" : "ghost"}
+                      disabled={slot.maxSlots === 0 || pending}
+                      onClick={() => handleSelectSlot(slot)}
+                    >
+                      {slot.time}
+                      {slot.maxSlots === 0 ? " (zajęte)" : ""}
+                    </Button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
