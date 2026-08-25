@@ -16,7 +16,7 @@ npm install
 cp .env.example .env   # uzupełnij NEXTAUTH_SECRET i ADMIN_PASSWORD_HASH
 npm run db:up           # startuje PostgreSQL w Dockerze
 npx prisma migrate dev  # tworzy schemat bazy danych
-npx prisma db seed      # sektory (1-32, A-E) + domyślne ustawienia rezerwacji
+npx prisma db seed      # sektory (1-32) + domyślne ustawienia rezerwacji
 npm run dev
 ```
 

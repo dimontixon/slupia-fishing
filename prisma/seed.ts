@@ -5,16 +5,11 @@ const prisma = new PrismaClient();
 type Point = { x: number; y: number };
 
 // Approximate positions (in % of public/mapa.jpg width/height) of each
-// numbered/lettered peg, eyeballed from the satellite photo of "Łowisko
-// Komercyjne SŁUPIA". These are placeholder polygons meant to make the map
-// clickable out of the box — refine the exact shapes later via Prisma
-// Studio or the admin panel (JSON/form editing, per CLAUDE.md).
+// numbered peg, eyeballed from the satellite photo of "Łowisko Komercyjne
+// SŁUPIA". These are placeholder polygons meant to make the map clickable
+// out of the box — refine the exact shapes later via Prisma Studio or the
+// admin panel (JSON/form editing, per CLAUDE.md).
 const SECTOR_CENTERS: { code: string; center: Point }[] = [
-  { code: "A", center: { x: 30, y: 13 } },
-  { code: "B", center: { x: 33, y: 12 } },
-  { code: "C", center: { x: 37, y: 12 } },
-  { code: "D", center: { x: 40, y: 13 } },
-  { code: "E", center: { x: 43, y: 15 } },
   { code: "15", center: { x: 22, y: 19 } },
   { code: "16", center: { x: 21, y: 43 } },
   { code: "17", center: { x: 22, y: 46 } },
