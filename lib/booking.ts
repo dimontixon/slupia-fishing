@@ -5,11 +5,12 @@ import { Prisma, BookingStatus } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
-type BookingSettingsShape = {
+export type BookingSettingsShape = {
   slotStartTimes: string[];
   slotStepHours: number;
   minSlots: number;
   maxSlots: number;
+  cancellationHoursBefore: number;
   requireManualConfirmation: boolean;
 };
 
@@ -18,10 +19,11 @@ const DEFAULT_SETTINGS: BookingSettingsShape = {
   slotStepHours: 12,
   minSlots: 1,
   maxSlots: 4,
+  cancellationHoursBefore: 24,
   requireManualConfirmation: true,
 };
 
-async function getBookingSettingsOrDefault(): Promise<BookingSettingsShape> {
+export async function getBookingSettingsOrDefault(): Promise<BookingSettingsShape> {
   const settings = await prisma.bookingSettings.findFirst();
   return settings ?? DEFAULT_SETTINGS;
 }
