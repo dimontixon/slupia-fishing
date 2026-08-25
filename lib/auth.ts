@@ -71,6 +71,7 @@ const config: NextAuthConfig = {
     },
     session({ session, token }) {
       if (session.user) {
+        session.user.id = token.sub as string;
         session.user.role = token.role as Role;
       }
       return session;

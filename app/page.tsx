@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 import { SectorMap, type MapSector } from "@/components/sector-map";
 
 // Sector availability changes with every booking, so this page must always
@@ -6,10 +7,14 @@ import { SectorMap, type MapSector } from "@/components/sector-map";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const sectors = await prisma.sector.findMany({
-    where: { isActive: true },
-    orderBy: { code: "asc" },
-  });
+  const [sectors, session] = await Promise.all([
+    prisma.sector.findMany({
+      where: { isActive: true },
+      orderBy: { code: "asc" },
+    }),
+    auth(),
+  ]);
+  const isLoggedIn = session?.user?.role === "client";
 
   const mapSectors: MapSector[] = sectors.map((sector) => ({
     id: sector.id,
@@ -27,7 +32,7 @@ export default async function HomePage() {
           Wybierz sektor na mapie, aby zobaczyć szczegóły i zarezerwować.
         </p>
       </div>
-      <SectorMap sectors={mapSectors} />
+      <SectorMap sectors={mapSectors} isLoggedIn={isLoggedIn} />
     </main>
   );
 }
