@@ -19,7 +19,7 @@ export default async function AdminClientsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Klienci</h1>
+      <h1 className="font-heading text-xl font-semibold">Klienci</h1>
       <ClientsTable clients={adminClients} />
     </div>
   );

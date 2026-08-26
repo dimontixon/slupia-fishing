@@ -7,9 +7,9 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-nunito-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: var(--font-source-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +39,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-accent-warm-foreground: var(--accent-warm-foreground);
+  --color-accent-warm: var(--accent-warm);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -49,30 +51,36 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  /* "Natura / Jezioro" theme — applies app-wide (public site and admin
+     panel alike). Kept at :root (rather than a scoped wrapper class) so
+     portaled content — Dialog/AlertDialog/Select popups render into
+     document.body, outside any wrapper div — inherits it too. */
+  --background: oklch(0.92 0.017 88);
+  --foreground: oklch(0.22 0.02 90);
+  --card: oklch(0.995 0.006 95);
+  --card-foreground: oklch(0.22 0.02 90);
+  --popover: oklch(0.995 0.006 95);
+  --popover-foreground: oklch(0.22 0.02 90);
+  --primary: oklch(0.42 0.08 195);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.93 0.02 90);
+  --secondary-foreground: oklch(0.22 0.02 90);
+  --muted: oklch(0.94 0.018 95);
+  --muted-foreground: oklch(0.45 0.02 90);
+  --accent: oklch(0.9 0.04 190);
+  --accent-foreground: oklch(0.32 0.08 195);
+  --accent-warm: oklch(0.91 0.045 75);
+  --accent-warm-foreground: oklch(0.32 0.05 75);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: oklch(0.88 0.02 95);
+  --input: oklch(0.88 0.02 95);
+  --ring: oklch(0.6 0.07 190);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
+  --radius: 0.9rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -123,35 +131,15 @@
   }
   body {
     @apply bg-background text-foreground;
+    /* Faint scattered fish/anchor/waves texture — path data lifted from the
+       Fish/Anchor/Waves icons already used in the UI, so it matches. Kept
+       on body's own background rather than the --background token, so
+       UI chrome that also uses bg-background (e.g. the admin mobile tab
+       bar) stays a flat color instead of picking up the pattern too. */
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'><g fill='none' stroke='rgba(15,76,70,0.06)' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><g transform='translate(11,14) rotate(-19) scale(1.19)'><path d='M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z'/><path d='M18 12v.5'/><path d='M16 17.93a9.77 9.77 0 0 1 0-11.86'/><path d='M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33'/><path d='M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4'/><path d='m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98'/></g><g transform='translate(84,11) rotate(-21) scale(1.41)'><path d='M12 6v16'/><path d='m19 13 2-1a9 9 0 0 1-18 0l2 1'/><path d='M9 11h6'/><circle cx='12' cy='4' r='2'/></g><g transform='translate(165,8) rotate(-11) scale(1.37)'><path d='M2 12q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 19q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 5q2.5 2 5 0t5 0 5 0 5 0'/></g><g transform='translate(17,70) rotate(0) scale(1.18)'><path d='M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z'/><path d='M18 12v.5'/><path d='M16 17.93a9.77 9.77 0 0 1 0-11.86'/><path d='M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33'/><path d='M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4'/><path d='m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98'/></g><g transform='translate(93,73) rotate(3) scale(1.27)'><path d='M12 6v16'/><path d='m19 13 2-1a9 9 0 0 1-18 0l2 1'/><path d='M9 11h6'/><circle cx='12' cy='4' r='2'/></g><g transform='translate(149,69) rotate(22) scale(1.44)'><path d='M2 12q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 19q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 5q2.5 2 5 0t5 0 5 0 5 0'/></g><g transform='translate(222,84) rotate(23) scale(1.17)'><path d='M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z'/><path d='M18 12v.5'/><path d='M16 17.93a9.77 9.77 0 0 1 0-11.86'/><path d='M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33'/><path d='M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4'/><path d='m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98'/></g><g transform='translate(8,163) rotate(9) scale(1.20)'><path d='M12 6v16'/><path d='m19 13 2-1a9 9 0 0 1-18 0l2 1'/><path d='M9 11h6'/><circle cx='12' cy='4' r='2'/></g><g transform='translate(149,179) rotate(-3) scale(1.18)'><path d='M2 12q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 19q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 5q2.5 2 5 0t5 0 5 0 5 0'/></g><g transform='translate(238,155) rotate(-17) scale(1.37)'><path d='M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z'/><path d='M18 12v.5'/><path d='M16 17.93a9.77 9.77 0 0 1 0-11.86'/><path d='M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33'/><path d='M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4'/><path d='m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98'/></g><g transform='translate(6,231) rotate(-21) scale(1.42)'><path d='M12 6v16'/><path d='m19 13 2-1a9 9 0 0 1-18 0l2 1'/><path d='M9 11h6'/><circle cx='12' cy='4' r='2'/></g><g transform='translate(76,251) rotate(-1) scale(1.18)'><path d='M2 12q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 19q2.5 2 5 0t5 0 5 0 5 0'/><path d='M2 5q2.5 2 5 0t5 0 5 0 5 0'/></g><g transform='translate(165,233) rotate(13) scale(1.33)'><path d='M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z'/><path d='M18 12v.5'/><path d='M16 17.93a9.77 9.77 0 0 1 0-11.86'/><path d='M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33'/><path d='M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4'/><path d='m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98'/></g><g transform='translate(223,226) rotate(-2) scale(1.13)'><path d='M12 6v16'/><path d='m19 13 2-1a9 9 0 0 1-18 0l2 1'/><path d='M9 11h6'/><circle cx='12' cy='4' r='2'/></g></g></svg>");
+    background-repeat: repeat;
   }
   html {
     @apply font-sans;
   }
-}
-
-/* "Natura / Jezioro" theme for the public (client-facing) site — scoped so
-   the admin panel keeps its neutral default tokens untouched. */
-.theme-natura {
-  --background: oklch(0.97 0.012 95);
-  --foreground: oklch(0.22 0.02 90);
-  --card: oklch(0.995 0.006 95);
-  --card-foreground: oklch(0.22 0.02 90);
-  --popover: oklch(0.995 0.006 95);
-  --popover-foreground: oklch(0.22 0.02 90);
-  --primary: oklch(0.42 0.08 195);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.93 0.02 90);
-  --secondary-foreground: oklch(0.22 0.02 90);
-  --muted: oklch(0.94 0.018 95);
-  --muted-foreground: oklch(0.45 0.02 90);
-  --accent: oklch(0.9 0.04 190);
-  --accent-foreground: oklch(0.32 0.08 195);
-  --border: oklch(0.88 0.02 95);
-  --input: oklch(0.88 0.02 95);
-  --ring: oklch(0.6 0.07 190);
-  --radius: 0.9rem;
-  --font-sans: var(--font-nunito-sans);
-  --font-heading: var(--font-source-serif);
-  background: var(--background);
-  color: var(--foreground);
 }

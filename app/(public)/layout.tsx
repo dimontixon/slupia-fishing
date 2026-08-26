@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="theme-natura flex flex-1 flex-col">
+    <div className="flex min-w-0 flex-1 flex-col">
       <SiteHeader />
       {children}
       <SiteFooter />

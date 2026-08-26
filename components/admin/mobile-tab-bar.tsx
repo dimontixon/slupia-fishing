@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, CalendarCheck2, Users, Settings } from "lucide-react";
+import { LayoutGrid, CalendarDays, CalendarCheck2, Users, Settings } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
 const TABS = [
   { href: "/admin", label: "Sektory", icon: LayoutGrid },
+  { href: "/admin/kalendarz", label: "Kalendarz", icon: CalendarDays },
   { href: "/admin/rezerwacje", label: "Rezerwacje", icon: CalendarCheck2 },
   { href: "/admin/klienci", label: "Klienci", icon: Users },
   { href: "/admin/ustawienia", label: "Ustawienia", icon: Settings },

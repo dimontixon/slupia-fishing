@@ -16,61 +16,77 @@ async function requireAdminSession() {
 
 const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+// Every field is optional so callers can send a partial patch (e.g. just
+// `{ isActive }` from an inline toggle) — Prisma only touches the fields
+// present in `data`, so a partial call can never clobber a concurrent edit
+// to a different field with stale data (unlike resending a full payload
+// reconstructed from a possibly-stale client-side copy of the row).
 export async function updateSector(
   id: string,
   data: {
-    name: string;
-    basePrice: number;
-    isActive: boolean;
-    notes: string;
-    polygonJson: string;
+    name?: string;
+    basePrice?: number;
+    isActive?: boolean;
+    notes?: string;
+    polygonJson?: string;
   },
 ): Promise<ActionResult> {
   await requireAdminSession();
 
-  if (!data.name.trim()) {
-    return { ok: false, error: "Nazwa nie może być pusta." };
-  }
-  if (!Number.isFinite(data.basePrice) || data.basePrice <= 0) {
-    return { ok: false, error: "Cena musi być liczbą dodatnią." };
+  const updateData: Prisma.SectorUpdateInput = {};
+
+  if (data.name !== undefined) {
+    if (!data.name.trim()) {
+      return { ok: false, error: "Nazwa nie może być pusta." };
+    }
+    updateData.name = data.name.trim();
   }
 
-  let polygon: unknown;
-  try {
-    polygon = JSON.parse(data.polygonJson);
-  } catch {
-    return { ok: false, error: "Polygon musi być poprawnym JSON-em." };
-  }
-  const isValidPolygon =
-    Array.isArray(polygon) &&
-    polygon.length >= 3 &&
-    polygon.every(
-      (p) =>
-        p &&
-        typeof p.x === "number" &&
-        typeof p.y === "number" &&
-        p.x >= 0 &&
-        p.x <= 100 &&
-        p.y >= 0 &&
-        p.y <= 100,
-    );
-  if (!isValidPolygon) {
-    return {
-      ok: false,
-      error: "Polygon musi być tablicą min. 3 punktów {x,y} w zakresie 0-100.",
-    };
+  if (data.basePrice !== undefined) {
+    if (!Number.isFinite(data.basePrice) || data.basePrice <= 0) {
+      return { ok: false, error: "Cena musi być liczbą dodatnią." };
+    }
+    updateData.basePrice = data.basePrice;
   }
 
-  await prisma.sector.update({
-    where: { id },
-    data: {
-      name: data.name.trim(),
-      basePrice: data.basePrice,
-      isActive: data.isActive,
-      notes: data.notes.trim() || null,
-      polygon: polygon as Prisma.InputJsonValue,
-    },
-  });
+  if (data.isActive !== undefined) {
+    updateData.isActive = data.isActive;
+  }
+
+  if (data.notes !== undefined) {
+    updateData.notes = data.notes.trim() || null;
+  }
+
+  if (data.polygonJson !== undefined) {
+    let polygon: unknown;
+    try {
+      polygon = JSON.parse(data.polygonJson);
+    } catch {
+      return { ok: false, error: "Polygon musi być poprawnym JSON-em." };
+    }
+    const isValidPolygon =
+      Array.isArray(polygon) &&
+      polygon.length >= 3 &&
+      polygon.every(
+        (p) =>
+          p &&
+          typeof p.x === "number" &&
+          typeof p.y === "number" &&
+          p.x >= 0 &&
+          p.x <= 100 &&
+          p.y >= 0 &&
+          p.y <= 100,
+      );
+    if (!isValidPolygon) {
+      return {
+        ok: false,
+        error: "Polygon musi być tablicą min. 3 punktów {x,y} w zakresie 0-100.",
+      };
+    }
+    updateData.polygon = polygon as Prisma.InputJsonValue;
+  }
+
+  await prisma.sector.update({ where: { id }, data: updateData });
 
   return { ok: true };
 }

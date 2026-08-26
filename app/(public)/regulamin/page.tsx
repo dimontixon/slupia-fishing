@@ -55,24 +55,28 @@ const SECTIONS = [
 
 export default function RulesPage() {
   return (
-    <main className="mx-auto flex max-w-3xl flex-1 flex-col gap-8 px-4 py-10">
-      <div className="flex items-center gap-3">
-        <ScrollText className="size-7 text-muted-foreground" />
-        <h1 className="font-heading text-2xl font-semibold">Regulamin</h1>
+    <>
+      <div className="bg-accent-warm">
+        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-10">
+          <ScrollText className="size-7 text-accent-warm-foreground" />
+          <h1 className="font-heading text-2xl font-semibold text-accent-warm-foreground">Regulamin</h1>
+        </div>
       </div>
 
-      <div className="space-y-6">
-        {SECTIONS.map((section) => (
-          <div key={section.title} className="space-y-2">
-            <h2 className="font-heading text-lg font-medium">{section.title}</h2>
-            <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-              {section.items.map((item, index) => (
-                <li key={index}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-    </main>
+      <main className="mx-auto flex max-w-3xl flex-1 flex-col gap-8 px-4 py-10">
+        <div className="space-y-6">
+          {SECTIONS.map((section) => (
+            <div key={section.title} className="space-y-2 rounded-lg border bg-card p-4 ring-1 ring-primary/10">
+              <h2 className="font-heading text-lg font-medium">{section.title}</h2>
+              <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+                {section.items.map((item, index) => (
+                  <li key={index}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </main>
+    </>
   );
 }

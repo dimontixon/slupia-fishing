@@ -40,6 +40,13 @@ function todayISO(): string {
   return now.toISOString().slice(0, 10);
 }
 
+// Native date/time inputs only open their picker when the small calendar/
+// clock icon is clicked — this makes the whole field open it, on desktop
+// and mobile alike.
+function openPicker(event: React.MouseEvent<HTMLInputElement>) {
+  event.currentTarget.showPicker?.();
+}
+
 function formatPln(value: number): string {
   return `${value.toFixed(2).replace(".", ",")} zł`;
 }
@@ -248,6 +255,7 @@ export function BookingDialog({
                 min={todayISO()}
                 value={date}
                 onChange={(event) => handleDateChange(event.target.value)}
+                onClick={openPicker}
               />
             </div>
             <div className="space-y-2">
@@ -258,6 +266,7 @@ export function BookingDialog({
                     type="time"
                     value={customTime}
                     onChange={(event) => setCustomTime(event.target.value)}
+                    onClick={openPicker}
                     className="w-32"
                   />
                   <Button type="button" onClick={handleCheckCustomTime} disabled={pending || !customTime}>
@@ -291,7 +300,9 @@ export function BookingDialog({
               <Label>Liczba slotów (po 12h)</Label>
               <Select value={String(slotsCount)} onValueChange={(value) => setSlotsCount(Number(value))}>
                 <SelectTrigger>
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: string) => `${value} ${value === "1" ? "slot" : "sloty"}`}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {durationOptions.map((count) => (
