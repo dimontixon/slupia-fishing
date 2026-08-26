@@ -8,7 +8,7 @@ export default async function AdminSettingsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold">Ustawienia rezerwacji</h1>
+      <h1 className="font-heading text-xl font-semibold">Ustawienia rezerwacji</h1>
       <BookingSettingsForm settings={settings} />
     </div>
   );

@@ -19,7 +19,7 @@ export function SectorMap({ sectors, isLoggedIn }: { sectors: MapSector[]; isLog
 
   return (
     <>
-      <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-lg border">
+      <div className="relative mx-auto w-full max-w-4xl overflow-hidden rounded-lg border-2 border-primary/25 shadow-lg shadow-primary/10">
         <img
           src="/mapa.jpg"
           alt="Mapa satelitarna łowiska ze sektorami"

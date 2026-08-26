@@ -5,6 +5,7 @@ import { siteConfig } from "@/lib/site-config";
 
 const NAV_LINKS = [
   { href: "/", label: "Mapa sektorów" },
+  { href: "/kalendarz", label: "Kalendarz" },
   { href: "/o-lowisku", label: "O łowisku" },
   { href: "/regulamin", label: "Regulamin" },
   { href: "/kontakt", label: "Kontakt" },
@@ -38,20 +39,20 @@ function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function SiteFooter() {
   return (
-    <footer className="border-t bg-muted/30">
+    <footer className="bg-primary text-primary-foreground">
       <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div className="space-y-2">
           <p className="font-heading font-semibold">Łowisko Słupia</p>
           <nav className="flex flex-col gap-1 text-sm">
             {NAV_LINKS.map((link) => (
-              <Link key={link.href} href={link.href} className="text-muted-foreground hover:text-foreground">
+              <Link key={link.href} href={link.href} className="text-primary-foreground/75 hover:text-primary-foreground">
                 {link.label}
               </Link>
             ))}
           </nav>
         </div>
 
-        <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="space-y-2 text-sm text-primary-foreground/75">
           <p className="flex items-center gap-2">
             <Phone className="size-4 shrink-0" /> {siteConfig.phone}
           </p>
@@ -74,7 +75,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex size-9 items-center justify-center rounded-full bg-primary-foreground/15 text-primary-foreground transition-colors hover:bg-primary-foreground/25"
             >
               <FacebookIcon className="size-4" />
             </a>
@@ -83,7 +84,7 @@ export function SiteFooter() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
-              className="flex size-9 items-center justify-center rounded-full bg-primary text-primary-foreground transition-opacity hover:opacity-90"
+              className="flex size-9 items-center justify-center rounded-full bg-primary-foreground/15 text-primary-foreground transition-colors hover:bg-primary-foreground/25"
             >
               <InstagramIcon className="size-4" />
             </a>

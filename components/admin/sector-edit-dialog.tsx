@@ -12,32 +12,25 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 
 import { updateSector } from "@/lib/admin";
 import type { AdminSector } from "@/components/admin/sectors-table";
 
+// Nazwa, cena i status aktywności są edytowalne bezpośrednio w tabeli —
+// ten dialog obsługuje tylko to, co jeszcze nie ma tam swojego miejsca:
+// notatki i pozycję sektora na mapie (polygon).
 export function SectorEditDialog({ sector, onClose }: { sector: AdminSector | null; onClose: () => void }) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [basePrice, setBasePrice] = useState("");
-  const [isActive, setIsActive] = useState(true);
   const [notes, setNotes] = useState("");
   const [polygonJson, setPolygonJson] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
-  // Populate the form during render when a different sector is opened —
-  // no effect needed since the data is already available as a prop.
   const [loadedForId, setLoadedForId] = useState<string | null>(null);
   if (sector && sector.id !== loadedForId) {
     setLoadedForId(sector.id);
-    setName(sector.name);
-    setBasePrice(String(sector.basePrice));
-    setIsActive(sector.isActive);
     setNotes(sector.notes ?? "");
     setPolygonJson(JSON.stringify(sector.polygon, null, 2));
     setError(null);
@@ -48,13 +41,7 @@ export function SectorEditDialog({ sector, onClose }: { sector: AdminSector | nu
     if (!sector) return;
     setError(null);
     startTransition(async () => {
-      const result = await updateSector(sector.id, {
-        name,
-        basePrice: Number(basePrice.replace(",", ".")),
-        isActive,
-        notes,
-        polygonJson,
-      });
+      const result = await updateSector(sector.id, { notes, polygonJson });
       if (!result.ok) {
         setError(result.error);
         return;
@@ -73,23 +60,6 @@ export function SectorEditDialog({ sector, onClose }: { sector: AdminSector | nu
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && <p className="text-sm text-destructive">{error}</p>}
-          <div className="space-y-2">
-            <Label htmlFor="sector-name">Nazwa</Label>
-            <Input id="sector-name" value={name} onChange={(event) => setName(event.target.value)} required />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="sector-price">Cena (zł / 12h)</Label>
-            <Input
-              id="sector-price"
-              value={basePrice}
-              onChange={(event) => setBasePrice(event.target.value)}
-              required
-            />
-          </div>
-          <div className="flex items-center gap-2">
-            <Checkbox id="sector-active" checked={isActive} onCheckedChange={(value) => setIsActive(value === true)} />
-            <Label htmlFor="sector-active">Aktywny (widoczny na mapie)</Label>
-          </div>
           <div className="space-y-2">
             <Label htmlFor="sector-notes">Notatki</Label>
             <Textarea id="sector-notes" value={notes} onChange={(event) => setNotes(event.target.value)} rows={2} />

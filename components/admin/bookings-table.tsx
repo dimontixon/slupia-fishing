@@ -130,7 +130,7 @@ export function BookingsTable({ bookings }: { bookings: AdminBooking[] }) {
 
       <div className="flex flex-col gap-3 md:hidden">
         {bookings.map((booking) => (
-          <div key={booking.id} className="rounded-lg border p-4">
+          <div key={booking.id} className="rounded-lg border p-4 ring-1 ring-primary/15">
             <div className="flex items-center justify-between">
               <span className="font-medium">{booking.sectorName}</span>
               <Badge variant={STATUS_VARIANTS[booking.status]}>{STATUS_LABELS[booking.status]}</Badge>
