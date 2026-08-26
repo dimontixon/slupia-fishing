@@ -82,47 +82,81 @@ export function BookingsTable({ bookings }: { bookings: AdminBooking[] }) {
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Sektor</TableHead>
-          <TableHead>Klient</TableHead>
-          <TableHead>Termin</TableHead>
-          <TableHead>Sloty</TableHead>
-          <TableHead>Cena</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead />
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+    <>
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Sektor</TableHead>
+              <TableHead>Klient</TableHead>
+              <TableHead>Termin</TableHead>
+              <TableHead>Sloty</TableHead>
+              <TableHead>Cena</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead />
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {bookings.map((booking) => (
+              <TableRow key={booking.id}>
+                <TableCell>{booking.sectorName}</TableCell>
+                <TableCell>{booking.clientPhone}</TableCell>
+                <TableCell>
+                  {formatDateTime(booking.startAt)} – {formatDateTime(booking.endAt)}
+                </TableCell>
+                <TableCell>{booking.slotsCount}</TableCell>
+                <TableCell>{Number(booking.totalPrice).toFixed(2)} zł</TableCell>
+                <TableCell>
+                  <Badge variant={STATUS_VARIANTS[booking.status]}>{STATUS_LABELS[booking.status]}</Badge>
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  {ACTIONS[booking.status].map((action) => (
+                    <Button
+                      key={action.next}
+                      size="sm"
+                      variant="outline"
+                      disabled={pending}
+                      onClick={() => handleAction(booking.id, action.next)}
+                    >
+                      {action.label}
+                    </Button>
+                  ))}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex flex-col gap-3 md:hidden">
         {bookings.map((booking) => (
-          <TableRow key={booking.id}>
-            <TableCell>{booking.sectorName}</TableCell>
-            <TableCell>{booking.clientPhone}</TableCell>
-            <TableCell>
-              {formatDateTime(booking.startAt)} – {formatDateTime(booking.endAt)}
-            </TableCell>
-            <TableCell>{booking.slotsCount}</TableCell>
-            <TableCell>{Number(booking.totalPrice).toFixed(2)} zł</TableCell>
-            <TableCell>
+          <div key={booking.id} className="rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">{booking.sectorName}</span>
               <Badge variant={STATUS_VARIANTS[booking.status]}>{STATUS_LABELS[booking.status]}</Badge>
-            </TableCell>
-            <TableCell className="flex gap-2">
-              {ACTIONS[booking.status].map((action) => (
-                <Button
-                  key={action.next}
-                  size="sm"
-                  variant="outline"
-                  disabled={pending}
-                  onClick={() => handleAction(booking.id, action.next)}
-                >
-                  {action.label}
-                </Button>
-              ))}
-            </TableCell>
-          </TableRow>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {booking.clientPhone} · {formatDateTime(booking.startAt)} – {formatDateTime(booking.endAt)}
+            </p>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="font-medium">{Number(booking.totalPrice).toFixed(2)} zł</span>
+              <div className="flex gap-2">
+                {ACTIONS[booking.status].map((action) => (
+                  <Button
+                    key={action.next}
+                    size="sm"
+                    variant="outline"
+                    disabled={pending}
+                    onClick={() => handleAction(booking.id, action.next)}
+                  >
+                    {action.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </div>
         ))}
-      </TableBody>
-    </Table>
+      </div>
+    </>
   );
 }

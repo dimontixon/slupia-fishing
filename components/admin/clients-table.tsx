@@ -54,76 +54,109 @@ export function ClientsTable({ clients }: { clients: AdminClient[] }) {
     });
   }
 
+  function renderBlockAction(client: AdminClient) {
+    if (client.isBlocked) {
+      return (
+        <Button size="sm" variant="outline" disabled={pending} onClick={() => handleToggle(client.id)}>
+          Odblokuj
+        </Button>
+      );
+    }
+    return (
+      <AlertDialog
+        open={confirmBlockId === client.id}
+        onOpenChange={(open) => setConfirmBlockId(open ? client.id : null)}
+      >
+        <AlertDialogTrigger
+          render={
+            <Button size="sm" variant="destructive" disabled={pending}>
+              Zablokuj
+            </Button>
+          }
+        />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Zablokować klienta {client.phone}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Zablokowany klient nie będzie mógł dokonywać nowych rezerwacji.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Anuluj</AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              onClick={() => {
+                handleToggle(client.id);
+                setConfirmBlockId(null);
+              }}
+            >
+              Zablokuj
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
   return (
     <>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Telefon</TableHead>
-            <TableHead>Nazwa</TableHead>
-            <TableHead>Liczba rezerwacji</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {clients.map((client) => (
-            <TableRow key={client.id}>
-              <TableCell>{client.phone}</TableCell>
-              <TableCell>{client.name ?? "—"}</TableCell>
-              <TableCell>{client.bookingsCount}</TableCell>
-              <TableCell>
-                <Badge variant={client.isBlocked ? "destructive" : "outline"}>
-                  {client.isBlocked ? "Zablokowany" : "Aktywny"}
-                </Badge>
-              </TableCell>
-              <TableCell className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => setEditing(client)}>
-                  Edytuj
-                </Button>
-                {client.isBlocked ? (
-                  <Button size="sm" variant="outline" disabled={pending} onClick={() => handleToggle(client.id)}>
-                    Odblokuj
-                  </Button>
-                ) : (
-                  <AlertDialog
-                    open={confirmBlockId === client.id}
-                    onOpenChange={(open) => setConfirmBlockId(open ? client.id : null)}
-                  >
-                    <AlertDialogTrigger
-                      render={
-                        <Button size="sm" variant="destructive" disabled={pending}>
-                          Zablokuj
-                        </Button>
-                      }
-                    />
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Zablokować klienta {client.phone}?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Zablokowany klient nie będzie mógł dokonywać nowych rezerwacji.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Anuluj</AlertDialogCancel>
-                        <AlertDialogAction
-                          variant="destructive"
-                          onClick={() => {
-                            handleToggle(client.id);
-                            setConfirmBlockId(null);
-                          }}
-                        >
-                          Zablokuj
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </TableCell>
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Telefon</TableHead>
+              <TableHead>Nazwa</TableHead>
+              <TableHead>Liczba rezerwacji</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead />
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {clients.map((client) => (
+              <TableRow key={client.id}>
+                <TableCell>{client.phone}</TableCell>
+                <TableCell>{client.name ?? "—"}</TableCell>
+                <TableCell>{client.bookingsCount}</TableCell>
+                <TableCell>
+                  <Badge variant={client.isBlocked ? "destructive" : "outline"}>
+                    {client.isBlocked ? "Zablokowany" : "Aktywny"}
+                  </Badge>
+                </TableCell>
+                <TableCell className="flex gap-2">
+                  <Button size="sm" variant="outline" onClick={() => setEditing(client)}>
+                    Edytuj
+                  </Button>
+                  {renderBlockAction(client)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex flex-col gap-3 md:hidden">
+        {clients.map((client) => (
+          <div key={client.id} className="rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">{client.phone}</span>
+              <Badge variant={client.isBlocked ? "destructive" : "outline"}>
+                {client.isBlocked ? "Zablokowany" : "Aktywny"}
+              </Badge>
+            </div>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {client.name ?? "—"} · {client.bookingsCount}{" "}
+              {client.bookingsCount === 1 ? "rezerwacja" : "rezerwacji"}
+            </p>
+            <div className="mt-3 flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setEditing(client)}>
+                Edytuj
+              </Button>
+              {renderBlockAction(client)}
+            </div>
+          </div>
+        ))}
+      </div>
+
       <ClientEditDialog client={editing} onClose={() => setEditing(null)} />
     </>
   );
