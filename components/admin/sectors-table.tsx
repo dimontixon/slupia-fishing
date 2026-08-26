@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { SectorEditDialog } from "@/components/admin/sector-edit-dialog";
 
 import { updateAllSectorPrices } from "@/lib/admin";
@@ -49,18 +50,18 @@ function BulkPriceForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex items-end gap-2">
-      <div className="space-y-2">
+    <form onSubmit={handleSubmit} className="flex flex-col items-start gap-2 sm:flex-row sm:items-end">
+      <div className="w-full space-y-2 sm:w-auto">
         <Label htmlFor="bulk-price">Cena dla wszystkich sektorów (zł / 12h)</Label>
         <Input
           id="bulk-price"
           value={price}
           onChange={(event) => setPrice(event.target.value)}
-          className="w-40"
+          className="w-full sm:w-40"
           required
         />
       </div>
-      <Button type="submit" disabled={pending}>
+      <Button type="submit" disabled={pending} className="w-full sm:w-auto">
         Zastosuj do wszystkich
       </Button>
     </form>
@@ -73,32 +74,57 @@ export function SectorsTable({ sectors }: { sectors: AdminSector[] }) {
   return (
     <div className="space-y-4">
       <BulkPriceForm />
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Kod</TableHead>
-            <TableHead>Nazwa</TableHead>
-            <TableHead>Cena (zł / 12h)</TableHead>
-            <TableHead>Aktywny</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sectors.map((sector) => (
-            <TableRow key={sector.id}>
-              <TableCell>{sector.code}</TableCell>
-              <TableCell>{sector.name}</TableCell>
-              <TableCell>{Number(sector.basePrice).toFixed(2)}</TableCell>
-              <TableCell>{sector.isActive ? "Tak" : "Nie"}</TableCell>
-              <TableCell className="text-right">
-                <Button size="sm" variant="outline" onClick={() => setEditing(sector)}>
-                  Edytuj
-                </Button>
-              </TableCell>
+
+      <div className="hidden md:block">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Kod</TableHead>
+              <TableHead>Nazwa</TableHead>
+              <TableHead>Cena (zł / 12h)</TableHead>
+              <TableHead>Aktywny</TableHead>
+              <TableHead />
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {sectors.map((sector) => (
+              <TableRow key={sector.id}>
+                <TableCell>{sector.code}</TableCell>
+                <TableCell>{sector.name}</TableCell>
+                <TableCell>{Number(sector.basePrice).toFixed(2)}</TableCell>
+                <TableCell>{sector.isActive ? "Tak" : "Nie"}</TableCell>
+                <TableCell className="text-right">
+                  <Button size="sm" variant="outline" onClick={() => setEditing(sector)}>
+                    Edytuj
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex flex-col gap-3 md:hidden">
+        {sectors.map((sector) => (
+          <div key={sector.id} className="rounded-lg border p-4">
+            <div className="flex items-center justify-between">
+              <span className="font-medium">
+                {sector.code} · {sector.name}
+              </span>
+              <Badge variant={sector.isActive ? "outline" : "destructive"}>
+                {sector.isActive ? "Aktywny" : "Nieaktywny"}
+              </Badge>
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <span className="font-medium">{Number(sector.basePrice).toFixed(2)} zł</span>
+              <Button size="sm" variant="outline" onClick={() => setEditing(sector)}>
+                Edytuj
+              </Button>
+            </div>
+          </div>
+        ))}
+      </div>
+
       <SectorEditDialog sector={editing} onClose={() => setEditing(null)} />
     </div>
   );

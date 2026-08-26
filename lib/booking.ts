@@ -142,6 +142,14 @@ export async function getSectorAvailability(
   };
 }
 
+async function requireClientSession(): Promise<string> {
+  const session = await auth();
+  if (!session?.user || session.user.role !== "client") {
+    throw new Error("Musisz być zalogowany.");
+  }
+  return session.user.id;
+}
+
 class BookingConflictError extends Error {}
 
 function isSerializationConflict(error: unknown): boolean {
@@ -245,4 +253,75 @@ export async function createBooking(input: {
     }
     throw error;
   }
+}
+
+function isCancellable(
+  status: BookingStatus,
+  startAt: Date,
+  cancellationHoursBefore: number,
+): boolean {
+  if (status !== BookingStatus.PENDING && status !== BookingStatus.CONFIRMED) return false;
+  return startAt.getTime() - Date.now() >= cancellationHoursBefore * 60 * 60 * 1000;
+}
+
+export type MyBooking = {
+  id: string;
+  sectorName: string;
+  sectorCode: string;
+  startAt: string;
+  endAt: string;
+  slotsCount: number;
+  totalPrice: string;
+  status: BookingStatus;
+  cancellable: boolean;
+};
+
+export type MyBookingsResult =
+  | { ok: true; bookings: MyBooking[] }
+  | { ok: false; error: string };
+
+export async function getMyBookings(): Promise<MyBookingsResult> {
+  const clientId = await requireClientSession();
+  const settings = await getBookingSettingsOrDefault();
+
+  const bookings = await prisma.booking.findMany({
+    where: { clientId },
+    orderBy: { startAt: "desc" },
+    include: { sector: { select: { name: true, code: true } } },
+  });
+
+  return {
+    ok: true,
+    bookings: bookings.map((booking) => ({
+      id: booking.id,
+      sectorName: booking.sector.name,
+      sectorCode: booking.sector.code,
+      startAt: booking.startAt.toISOString(),
+      endAt: booking.endAt.toISOString(),
+      slotsCount: booking.slotsCount,
+      totalPrice: booking.totalPrice.toString(),
+      status: booking.status,
+      cancellable: isCancellable(booking.status, booking.startAt, settings.cancellationHoursBefore),
+    })),
+  };
+}
+
+export type CancelBookingResult = { ok: true } | { ok: false; error: string };
+
+export async function cancelMyBooking(bookingId: string): Promise<CancelBookingResult> {
+  const clientId = await requireClientSession();
+
+  const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+  if (!booking || booking.clientId !== clientId) {
+    return { ok: false, error: "Rezerwacja nie istnieje." };
+  }
+
+  const settings = await getBookingSettingsOrDefault();
+  if (!isCancellable(booking.status, booking.startAt, settings.cancellationHoursBefore)) {
+    return { ok: false, error: "Tej rezerwacji nie można już anulować." };
+  }
+
+  await prisma.booking.update({ where: { id: bookingId }, data: { status: BookingStatus.CANCELLED } });
+
+  return { ok: true };
 }

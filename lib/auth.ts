@@ -66,6 +66,7 @@ const config: NextAuthConfig = {
     jwt({ token, user }) {
       if (user) {
         token.role = user.role;
+        token.phone = user.phone;
       }
       return token;
     },
@@ -73,6 +74,7 @@ const config: NextAuthConfig = {
       if (session.user) {
         session.user.id = token.sub as string;
         session.user.role = token.role as Role;
+        session.user.phone = token.phone as string | undefined;
       }
       return session;
     },

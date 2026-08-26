@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -127,4 +127,31 @@
   html {
     @apply font-sans;
   }
+}
+
+/* "Natura / Jezioro" theme for the public (client-facing) site — scoped so
+   the admin panel keeps its neutral default tokens untouched. */
+.theme-natura {
+  --background: oklch(0.97 0.012 95);
+  --foreground: oklch(0.22 0.02 90);
+  --card: oklch(0.995 0.006 95);
+  --card-foreground: oklch(0.22 0.02 90);
+  --popover: oklch(0.995 0.006 95);
+  --popover-foreground: oklch(0.22 0.02 90);
+  --primary: oklch(0.42 0.08 195);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.93 0.02 90);
+  --secondary-foreground: oklch(0.22 0.02 90);
+  --muted: oklch(0.94 0.018 95);
+  --muted-foreground: oklch(0.45 0.02 90);
+  --accent: oklch(0.9 0.04 190);
+  --accent-foreground: oklch(0.32 0.08 195);
+  --border: oklch(0.88 0.02 95);
+  --input: oklch(0.88 0.02 95);
+  --ring: oklch(0.6 0.07 190);
+  --radius: 0.9rem;
+  --font-sans: var(--font-nunito-sans);
+  --font-heading: var(--font-source-serif);
+  background: var(--background);
+  color: var(--foreground);
 }

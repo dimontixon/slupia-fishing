@@ -34,7 +34,7 @@ export function SectorMap({ sectors, isLoggedIn }: { sectors: MapSector[]; isLog
             <polygon
               key={sector.id}
               points={sector.polygon.map((p) => `${p.x},${p.y}`).join(" ")}
-              className="cursor-pointer fill-emerald-400/40 stroke-emerald-600 stroke-[0.3] transition-colors hover:fill-emerald-400/70"
+              className="cursor-pointer fill-primary/40 stroke-primary stroke-[0.3] transition-colors hover:fill-primary/70"
               onClick={() => setSelected(sector)}
             >
               <title>{sector.name}</title>
