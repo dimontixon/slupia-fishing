@@ -217,7 +217,7 @@ export function ClientsTable({ clients }: { clients: AdminClient[] }) {
 
       <div className="flex flex-col gap-3 md:hidden">
         {clients.map((client) => (
-          <div key={client.id} className="rounded-lg border p-4 ring-1 ring-primary/15">
+          <div key={client.id} className="rounded-lg border-2 p-4 ring-1 ring-primary/15">
             <div className="flex items-center justify-between">
               <span className="font-medium">{client.phone}</span>
               <Badge variant={client.isBlocked ? "destructive" : "outline"}>

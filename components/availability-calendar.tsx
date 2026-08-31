@@ -79,7 +79,7 @@ export function AvailabilityCalendar({
           Deliberately not relying on `position: sticky` inside the
           scrolling grid — it wouldn't stay put reliably nested this many
           layers deep, this way the label column simply never moves. */}
-      <div className="flex min-w-0 overflow-hidden rounded-lg border">
+      <div className="flex min-w-0 overflow-hidden rounded-lg border-2">
         <div className="shrink-0 border-r" style={{ width: LABEL_COL_WIDTH }}>
           <div className="grid text-xs" style={{ gridAutoRows: ROW_HEIGHT }}>
             <div className="flex items-center border-b bg-card px-2 font-medium">Sektor</div>

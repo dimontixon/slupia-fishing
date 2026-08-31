@@ -211,7 +211,7 @@ export function SectorsTable({ sectors }: { sectors: AdminSector[] }) {
 
       <div className="flex flex-col gap-3 md:hidden">
         {sectors.map((sector) => (
-          <div key={sector.id} className="rounded-lg border p-4 ring-1 ring-primary/15">
+          <div key={sector.id} className="rounded-lg border-2 p-4 ring-1 ring-primary/15">
             <div className="flex items-center justify-between gap-2">
               <span className="font-medium">
                 {sector.code} · {renderEditableValue(sector, "name", sector.name)}
